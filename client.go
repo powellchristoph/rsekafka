@@ -6,9 +6,9 @@ import (
 	"fmt"
 )
 
-func getProducer(brokers *[]string) sarama.SyncProducer {
+func getProducer(brokers []string) sarama.SyncProducer {
 	fmt.Println("Getting producer.")
-	producer, err := sarama.NewSyncProducer([]string{"localhost:9092"}, nil)
+	producer, err := sarama.NewSyncProducer(brokers, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -16,8 +16,9 @@ func getProducer(brokers *[]string) sarama.SyncProducer {
 }
 
 /*
-func getConsumer(brokers *[]string) sarama.NewConsumer {
-	// get Kafka consumer
+func getConsumer(brokers *[]string) sarama.Consumer {
+
+	return consumer
 }
 */
 
@@ -25,16 +26,23 @@ func getConsumer(brokers *[]string) sarama.NewConsumer {
 
 type Client struct {
 	producer sarama.SyncProducer
-	//	consumer
+	//	consumer sarama.Consumer
 }
 
 func NewClient(brokers []string) *Client {
 	fmt.Println("Creating client")
 	return &Client{
-		producer: getProducer(&brokers),
-		//		consumer: getConsumer(&brokers),
+		producer: getProducer(brokers),
+		//consumer: getConsumer(&brokers),
 	}
 }
+
+/*
+func (c *Client) Close() error {
+	c.producer.Close()
+	//c.consumer.Close()
+}
+*/
 
 func (c *Client) Post(topic string, message string) error {
 	msg := &sarama.ProducerMessage{Topic: topic, Value: sarama.StringEncoder(message)}
